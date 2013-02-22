@@ -7,6 +7,9 @@ VERSION_NUMBER = "1.0.0"
 GROUP = "doctorj"
 COPYRIGHT = ""
 
+require 'rbconfig'
+target_os = RbConfig::CONFIG['target_os']
+
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://repo1.maven.org/maven2"
 
@@ -15,21 +18,24 @@ define "doctorj" do
   project.version = VERSION_NUMBER
   project.group = GROUP
   manifest["Implementation-Vendor"] = COPYRIGHT
-  
-  compile.with Dir['/Applications/LibreOffice.app/Contents/ure-link/share/java/*.jar'] 
-  compile.with Dir['/Applications/LibreOffice.app/Contents/MacOS/classes/*.jar']
-  #/Applications/LibreOffice.app/Contents/ure-link/share/java/juh.jar
-  #/Applications/LibreOffice.app/Contents/ure-link/share/java/jurt.jar
-  #/Applications/LibreOffice.app/Contents/ure-link/share/java/ridl.jar
-  #/Applications/LibreOffice.app/Contents/ure-link/share/java/unoloader.jar
-  #/Applications/LibreOffice.app/Contents/MacOS/classes/unoil.jar
 
-  test.compile.with Dir['/Applications/LibreOffice.app/Contents/ure-link/share/java/*.jar']
-  test.compile.with Dir['/Applications/LibreOffice.app/Contents/MacOS/classes/*.jar']
+  if target_os =~ /darwin/
+    ure_path = '/Applications/LibreOffice.app/Contents/ure-link/share/java'
+    uno_path = '/Applications/LibreOffice.app/Contents/MacOS'
+  elsif target_os =~ /mswin32/
+    ure_path = 'C:/Program Files (x86)/LibreOffice 4.0/URE/java'
+    uno_path = 'C:/Program Files (x86)/LibreOffice 4.0/program'
+  end
+
+  compile.with Dir["#{ure_path}/*.jar"]
+  compile.with "#{uno_path}/classes/unoil.jar"
   
+  test.compile.with Dir["#{ure_path}/*.jar"]
+  test.compile.with "#{uno_path}/classes/unoil.jar"
+    
   package(:jar)
   
   run.using :main => "DoctorJ",
-            :java_args => ['-d32', '-Dcom.sun.star.lib.loader.unopath="/Applications/LibreOffice.app/Contents/MacOS']
+            :java_args => ['-d32', "-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
 
 end
