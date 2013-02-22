@@ -1,14 +1,34 @@
 # doctorj
 
-Simple server to connect to LibreOffice and convert documents to PDF
+A simple server to connect to LibreOffice and convert documents to PDF format.
+
+The name comes from "Document to Renderable (Java)", 
+since I needed some software to batch convert Word Documents to PDFs that 
+are renderable in the browser.  But it's an easy name to remember because of 
+the basketball star.
 
 ## Installation
 
 1. Download and install LibreOffice_4.0.0
-2. Download and install buildr
-3. clone this git repository
-4. In the root directory, execute: buildr run
-5. Use the server API to post files and download PDFs
+http://www.libreoffice.org/download/
+
+2. Ensure a 32bit JDK is installed on the machine
+http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+3. Ensure your JAVA_HOME environment variable is set
+
+4. Ensure a 32bit JRuby is installed on the machine
+http://jruby.org/
+
+5. Install the buildr gem for JRuby:
+    jruby -S gem install buildr
+
+6. Clone this git repository
+
+7. In the repository's root directory, execute: 
+    buildr run
+
+8. Use the REST API to submit files for conversion, check on conversion status, and retrieve files.
 
 ## Testing
 
