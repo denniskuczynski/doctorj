@@ -13,6 +13,15 @@ target_os = RbConfig::CONFIG['target_os']
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://repo1.maven.org/maven2"
 
+
+COMMONS_IO = ['commons-io:commons-io:jar:2.4']
+
+JETTY = ['org.mortbay.jetty:servlet-api:jar:3.0.20100224',
+         'org.eclipse.jetty.aggregate:jetty-all:jar:8.1.9.v20130131']
+
+JERSEY = ['asm:asm:jar:3.3.1',
+          'com.sun.jersey:jersey-bundle:jar:1.17']
+
 desc "The Doctorj project"
 define "doctorj" do
   project.version = VERSION_NUMBER
@@ -29,13 +38,19 @@ define "doctorj" do
 
   compile.with Dir["#{ure_path}/*.jar"]
   compile.with "#{uno_path}/classes/unoil.jar"
+  compile.with JETTY
+  compile.with JERSEY
+  compile.with COMMONS_IO
   
   test.compile.with Dir["#{ure_path}/*.jar"]
   test.compile.with "#{uno_path}/classes/unoil.jar"
+  test.compile.with JETTY
+  test.compile.with JERSEY
+  test.compile.with COMMONS_IO
     
   package(:jar)
   
-  run.using :main => "DoctorJ",
+  run.using :main => "doctorj.Application",
             :java_args => ['-d32', "-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
 
 end

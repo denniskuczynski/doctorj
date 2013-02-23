@@ -1,11 +1,29 @@
+package doctorj;
+
 import com.sun.star.uno.UnoRuntime;
 import java.io.File;
 
-public class DoctorJ {
+public class DocumentConverter {
 
-    static com.sun.star.frame.XComponentLoader xCompLoader = null;
+    private com.sun.star.frame.XComponentLoader xCompLoader = null;
 
-    static void convertDocumentToPDF(File document, File outputDir) 
+    public void initialize()
+        throws Exception {
+        com.sun.star.uno.XComponentContext xContext = 
+            com.sun.star.comp.helper.Bootstrap.bootstrap();
+
+        com.sun.star.lang.XMultiComponentFactory xMCF = 
+                xContext.getServiceManager();
+
+        Object oDesktop = xMCF.createInstanceWithContext(
+            "com.sun.star.frame.Desktop", xContext);
+
+        this.xCompLoader = (com.sun.star.frame.XComponentLoader)
+            UnoRuntime.queryInterface(com.sun.star.frame.XComponentLoader.class,
+                oDesktop);
+    }
+
+    public void convertDocumentToPDF(File document, File outputDir) 
         throws com.sun.star.io.IOException, 
                com.sun.star.util.CloseVetoException {
         String inputURL = getFileURL(document);
@@ -15,12 +33,12 @@ public class DoctorJ {
         closeDocument(xStorable);
     }
 
-    static String getFileURL(File file) {
+    private String getFileURL(File file) {
         return "file:///" + file.getAbsolutePath().replace( '\\', '/' );
     }
 
     // Return an object that will offer a simple way to store a document to a URL.    
-    static com.sun.star.frame.XStorable openDocument(String inputURL)
+    private com.sun.star.frame.XStorable openDocument(String inputURL)
         throws com.sun.star.io.IOException {
         com.sun.star.beans.PropertyValue propertyValues[] =
             new com.sun.star.beans.PropertyValue[1];
@@ -29,7 +47,7 @@ public class DoctorJ {
         propertyValues[0].Value = new Boolean(true);
 
         Object oDocToStore =
-            DoctorJ.xCompLoader.loadComponentFromURL(
+            this.xCompLoader.loadComponentFromURL(
                 inputURL, "_blank", 0, propertyValues);
         
         com.sun.star.frame.XStorable xStorable =
@@ -39,7 +57,7 @@ public class DoctorJ {
         return xStorable;
     }
 
-    static void processDocument(com.sun.star.frame.XStorable xStorable, String inputURL, String outputURL) 
+    private void processDocument(com.sun.star.frame.XStorable xStorable, String inputURL, String outputURL) 
         throws com.sun.star.io.IOException {
         com.sun.star.beans.PropertyValue propertyValues[] = 
             new com.sun.star.beans.PropertyValue[2];
@@ -62,7 +80,7 @@ public class DoctorJ {
 
     // Closing the converted document. Use XCloseable.clsoe if the
     // interface is supported, otherwise use XComponent.dispose    
-    static void closeDocument(com.sun.star.frame.XStorable xStorable)
+    private void closeDocument(com.sun.star.frame.XStorable xStorable)
        throws com.sun.star.util.CloseVetoException {
         com.sun.star.util.XCloseable xCloseable =
             (com.sun.star.util.XCloseable)UnoRuntime.queryInterface(
@@ -77,29 +95,5 @@ public class DoctorJ {
             xComp.dispose();
         }
         System.out.println("Closed document");
-    }
-
-    public static void main( String args[] ) {
-        com.sun.star.uno.XComponentContext xContext = null;
-        try {
-            xContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
-            System.out.println("Connected to a running office ...");
-
-            com.sun.star.lang.XMultiComponentFactory xMCF = 
-                xContext.getServiceManager();
-
-            Object oDesktop = xMCF.createInstanceWithContext(
-                "com.sun.star.frame.Desktop", xContext);
-
-            xCompLoader = (com.sun.star.frame.XComponentLoader)
-                UnoRuntime.queryInterface(com.sun.star.frame.XComponentLoader.class,
-                                          oDesktop);
-
-            convertDocumentToPDF(new File("./data/example_docs/test1.odt"), new File("./data/output_docs"));
-            System.exit(0);
-        } catch( Exception e ) {
-            e.printStackTrace(System.err);
-            System.exit(1);
-        }
     }
 }
