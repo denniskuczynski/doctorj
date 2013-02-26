@@ -16,6 +16,8 @@ public enum ConversionManager {
     private static final String STATUS_IN_PROCESS = "InProcess";
     private static final String STATUS_COMPLETE   = "Complete";
 
+    private static final String OUTPUT_DIRECTORY = "./data/output";
+
     private DocumentConverter documentConverter = null;
     private ConcurrentHashMap<String, String> requestStatusMap = null;
     private ExecutorService executor = null;
@@ -46,7 +48,7 @@ public enum ConversionManager {
             public void run() {
                 System.out.println("Converting to PDF: "+file.getAbsolutePath());
                 try {
-                    documentConverter.convertDocumentToPDF(file, new File("./data/output"));
+                    documentConverter.convertDocumentToPDF(file, new File(OUTPUT_DIRECTORY));
                     requestStatusMap.put(id, STATUS_COMPLETE);
                 } catch(Exception e) {
                     requestStatusMap.put(id, STATUS_ERROR);
@@ -57,11 +59,9 @@ public enum ConversionManager {
     }
 
     public String deleteConversionRequest(String id) {
-        File file = new File("./data/output/"+id+".pdf");
+        File file = new File(OUTPUT_DIRECTORY+"/"+id+".pdf");
         try {
-            if (file.exists()) {
-                file.delete();
-            }
+            if (file.exists()) { file.delete(); }
         } catch(Exception e) {
             System.out.println("Error deleting file: "+file.getAbsolutePath());
         }
