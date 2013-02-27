@@ -9,8 +9,12 @@ public class Application
 {
     public static void main(String[] args) throws Exception
     {
-        ConversionManager.INSTANCE.initialize();
-
+        int numberOfThreads = 1;
+        //DocumentConverter documentConverter = new DummyDocumentConverter();
+        DocumentConverter documentConverter = new LibreOfficeDocumentConverter();
+        documentConverter.initialize();
+        ConversionManager.INSTANCE.initialize(numberOfThreads, documentConverter);
+        
         ServletHolder sh = new ServletHolder(ServletContainer.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         sh.setInitParameter("com.sun.jersey.config.property.packages", "doctorj.resources");

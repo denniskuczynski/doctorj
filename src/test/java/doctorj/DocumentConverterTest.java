@@ -13,9 +13,17 @@ import java.io.File;
 public class DocumentConverterTest {
 
     @Test
-    public void testConversion() 
+    public void testDummyDocumentConversion() 
       throws Exception {
-        DocumentConverter converter = new DocumentConverter();
+        DocumentConverter converter = new DummyDocumentConverter();
+        converter.initialize();
+        converter.convertDocumentToPDF(new File("./data/example_docs/test1.odt"), new File("./data/output_docs"));
+    }
+
+    @Test
+    public void testLibreOfficeDocumentConversion() 
+      throws Exception {
+        DocumentConverter converter = new LibreOfficeDocumentConverter();
         converter.initialize();
         converter.convertDocumentToPDF(new File("./data/example_docs/test1.odt"), new File("./data/output_docs"));
     }

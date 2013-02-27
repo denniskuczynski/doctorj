@@ -43,6 +43,6 @@ public class ConversionRequestResource {
     @DELETE 
     @Produces("text/plain")
     public String deleteConversionRequest(@PathParam(value = "id") final String id) {
-        return doctorj.ConversionManager.INSTANCE.deleteConversionRequest("1");
+        return doctorj.ConversionManager.INSTANCE.deleteConversionRequest(id);
     }
 }

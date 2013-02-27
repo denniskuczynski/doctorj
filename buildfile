@@ -22,6 +22,53 @@ JETTY = ['org.mortbay.jetty:servlet-api:jar:3.0.20100224',
 JERSEY = ['asm:asm:jar:3.3.1',
           'com.sun.jersey:jersey-bundle:jar:1.17']
 
+def get_conversion_status(id)
+  uri = URI.parse("http://localhost:8080/convert/#{id}")
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Get.new(uri.request_uri)
+  response = http.request(request)
+  return response.body
+end
+
+def add_conversion(file_path)
+  contents = open(file_path, "rb") {|io| io.read }
+
+  uri = URI.parse("http://localhost:8080/convert")
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request["Content-Type"] = "application/octet-stream"
+  request.body = contents
+  response = http.request(request)
+  return response.body
+end
+
+def delete_conversion(id)
+  uri = URI.parse("http://localhost:8080/convert/#{id}")
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Delete.new(uri.request_uri)
+  response = http.request(request)
+  return response.body
+end
+
+task :test_client do
+  require "net/http"
+  require "uri"
+
+  file_path = './data/example_docs/test1.odt'
+  puts "Sending request to convert: #{file_path}"
+  id = add_conversion(file_path)
+  puts "Retrieved tracking id: #{id}"
+  puts "Waiting 5 seconds..."
+  puts "Checking status of request: #{id}"
+  status = get_conversion_status(id)
+  if status == 'COMPLETE'
+    puts "Request COMPLETE, Deleting request files"
+    status = delete_conversion(id)
+  else
+    puts "Request #{status}"
+  end
+end
+
 desc "The Doctorj project"
 define "doctorj" do
   project.version = VERSION_NUMBER
@@ -31,9 +78,11 @@ define "doctorj" do
   if target_os =~ /darwin/
     ure_path = '/Applications/LibreOffice.app/Contents/ure-link/share/java'
     uno_path = '/Applications/LibreOffice.app/Contents/MacOS'
+    java_args = ["-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
   elsif target_os =~ /mswin32/
     ure_path = 'C:/Program Files (x86)/LibreOffice 4.0/URE/java'
     uno_path = 'C:/Program Files (x86)/LibreOffice 4.0/program'
+    java_args = ['-d32', "-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
   end
 
   compile.with Dir["#{ure_path}/*.jar"]
@@ -51,6 +100,5 @@ define "doctorj" do
   package(:jar)
   
   run.using :main => "doctorj.Application",
-            :java_args => ['-d32', "-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
-
+            :java_args => java_args
 end

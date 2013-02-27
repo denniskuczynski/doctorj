@@ -9,8 +9,6 @@ import java.io.File;
 public enum ConversionManager {
     INSTANCE;
 
-    private static final int CONVERSION_THREADS = 1;
-
     private static final String STATUS_NOT_FOUND  = "NotFound";
     private static final String STATUS_ERROR  = "Error";
     private static final String STATUS_IN_PROCESS = "InProcess";
@@ -18,21 +16,21 @@ public enum ConversionManager {
 
     private static final String OUTPUT_DIRECTORY = "./data/output";
 
+    private int conversionThreads = 1;
     private DocumentConverter documentConverter = null;
     private ConcurrentHashMap<String, String> requestStatusMap = null;
     private ExecutorService executor = null;
-    
-    public void initialize()
-        throws Exception {
-        documentConverter = new DocumentConverter();
-        documentConverter.initialize();
 
-        requestStatusMap = new ConcurrentHashMap<String, String>();
-        executor = Executors.newFixedThreadPool(CONVERSION_THREADS);
+    public void initialize(int threads, DocumentConverter documentConverter)
+        throws Exception {
+        this.conversionThreads = threads;
+        this.documentConverter = documentConverter;
+        this.requestStatusMap = new ConcurrentHashMap<String, String>();
+        this.executor = Executors.newFixedThreadPool(this.conversionThreads);
     }
     
     public String getConversionRequestStatus(String id) {
-        String status = requestStatusMap.get(id);
+        String status = this.requestStatusMap.get(id);
         if (status == null) {
             return STATUS_NOT_FOUND;
         } else {
@@ -42,16 +40,17 @@ public enum ConversionManager {
 
     public String addConversionRequest(final File file) {
         final String id = java.util.UUID.randomUUID().toString();
-        requestStatusMap.put(id, STATUS_IN_PROCESS);
-        executor.submit(new Runnable() {
+        this.requestStatusMap.put(id, STATUS_IN_PROCESS);
+        this.executor.submit(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Converting to PDF: "+file.getAbsolutePath());
                 try {
-                    documentConverter.convertDocumentToPDF(file, new File(OUTPUT_DIRECTORY));
-                    requestStatusMap.put(id, STATUS_COMPLETE);
+                    ConversionManager.this.documentConverter.convertDocumentToPDF(file, new File(OUTPUT_DIRECTORY));
+                    ConversionManager.this.requestStatusMap.put(id, STATUS_COMPLETE);
+                    System.out.println("Set Status for id: "+STATUS_COMPLETE+", "+id);
                 } catch(Exception e) {
-                    requestStatusMap.put(id, STATUS_ERROR);
+                    ConversionManager.this.requestStatusMap.put(id, STATUS_ERROR);
                 }
             }
         });
@@ -65,6 +64,12 @@ public enum ConversionManager {
         } catch(Exception e) {
             System.out.println("Error deleting file: "+file.getAbsolutePath());
         }
-        return requestStatusMap.remove(id);
+        String status = this.requestStatusMap.remove(id);
+        System.out.println("Status for id: "+status+", "+id);
+        if (status == null) {
+            return STATUS_NOT_FOUND;
+        } else {
+            return status;
+        }
     } 
 }
