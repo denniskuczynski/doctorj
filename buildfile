@@ -42,6 +42,14 @@ def add_conversion(file_path)
   return response.body
 end
 
+def get_conversion_file(id)
+  uri = URI.parse("http://localhost:8080/convert/#{id}/file")
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Get.new(uri.request_uri)
+  response = http.request(request)
+  return response.body
+end
+
 def delete_conversion(id)
   uri = URI.parse("http://localhost:8080/convert/#{id}")
   http = Net::HTTP.new(uri.host, uri.port)
@@ -61,11 +69,18 @@ task :test_client do
   puts "Waiting 5 seconds..."
   puts "Checking status of request: #{id}"
   status = get_conversion_status(id)
-  if status == 'COMPLETE'
-    puts "Request COMPLETE, Deleting request files"
-    status = delete_conversion(id)
+  if status == 'Complete'
+    puts "Request: Complete, Retrieving file"
+    file = get_conversion_file(id)
+    if file
+      puts "Retrieved: #{file.size} bytes"
+      puts "Cleaning up request data"
+      status = delete_conversion(id)
+    else
+      puts "Unable to retrieve file"
+    end
   else
-    puts "Request #{status}"
+    puts "Request: #{status}"
   end
 end
 

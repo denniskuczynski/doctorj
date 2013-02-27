@@ -24,10 +24,10 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
                 oDesktop);
     }
 
-    public void convertDocumentToPDF(File document, File outputDir) 
+    public void convertDocumentToPDF(File document, File outputFile) 
         throws Exception {
         String inputURL = getFileURL(document);
-        String outputURL = getFileURL(outputDir);
+        String outputURL = getFileURL(outputFile);
         com.sun.star.frame.XStorable xStorable = openDocument(inputURL);
         processDocument(xStorable, inputURL, outputURL);
         closeDocument(xStorable);
@@ -68,13 +68,8 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
         propertyValues[1].Name = "FilterName";
         propertyValues[1].Value = "writer_pdf_Export";
 
-        // Appending the favoured extension to the origin document name
-        int index1 = inputURL.lastIndexOf('/');
-        int index2 = inputURL.lastIndexOf('.');
-        String storeToURL = outputURL + inputURL.substring(index1, index2 + 1) + "pdf";
-
         // Storing and converting the document
-        xStorable.storeToURL(storeToURL, propertyValues);
+        xStorable.storeToURL(outputURL, propertyValues);
         System.out.println("Wrote file to: "+outputURL);
     }
 

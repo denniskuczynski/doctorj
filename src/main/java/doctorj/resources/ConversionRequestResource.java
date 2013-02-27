@@ -39,6 +39,13 @@ public class ConversionRequestResource {
         return doctorj.ConversionManager.INSTANCE.addConversionRequest(temp);
     }
 
+    @Path("/{id}/file")
+    @GET
+    @Produces("application/octet-stream")
+    public File getConversionRequestFile(@PathParam(value = "id") final String id) {
+        return doctorj.ConversionManager.INSTANCE.getConversionRequestFile(id);
+    }
+
     @Path("/{id}")
     @DELETE 
     @Produces("text/plain")

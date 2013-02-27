@@ -14,7 +14,7 @@ public enum ConversionManager {
     private static final String STATUS_IN_PROCESS = "InProcess";
     private static final String STATUS_COMPLETE   = "Complete";
 
-    private static final String OUTPUT_DIRECTORY = "./data/output";
+    private static final String OUTPUT_DIRECTORY = "./data/output_docs";
 
     private int conversionThreads = 1;
     private DocumentConverter documentConverter = null;
@@ -46,30 +46,37 @@ public enum ConversionManager {
             public void run() {
                 System.out.println("Converting to PDF: "+file.getAbsolutePath());
                 try {
-                    ConversionManager.this.documentConverter.convertDocumentToPDF(file, new File(OUTPUT_DIRECTORY));
+                    ConversionManager.this.documentConverter.convertDocumentToPDF(file, getOutputFile(id));
                     ConversionManager.this.requestStatusMap.put(id, STATUS_COMPLETE);
-                    System.out.println("Set Status for id: "+STATUS_COMPLETE+", "+id);
                 } catch(Exception e) {
                     ConversionManager.this.requestStatusMap.put(id, STATUS_ERROR);
+                    e.printStackTrace();
                 }
             }
         });
         return id;
     }
 
+    public File getConversionRequestFile(String id) {
+        return getOutputFile(id);
+    }
+
     public String deleteConversionRequest(String id) {
-        File file = new File(OUTPUT_DIRECTORY+"/"+id+".pdf");
+        File file = getOutputFile(id);
         try {
             if (file.exists()) { file.delete(); }
         } catch(Exception e) {
             System.out.println("Error deleting file: "+file.getAbsolutePath());
         }
         String status = this.requestStatusMap.remove(id);
-        System.out.println("Status for id: "+status+", "+id);
         if (status == null) {
             return STATUS_NOT_FOUND;
         } else {
             return status;
         }
-    } 
+    }
+
+    private File getOutputFile(String id) {
+        return new File(OUTPUT_DIRECTORY+"/"+id+".pdf");
+    }
 }
