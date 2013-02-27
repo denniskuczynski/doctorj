@@ -67,6 +67,7 @@ task :test_client do
   id = add_conversion(file_path)
   puts "Retrieved tracking id: #{id}"
   puts "Waiting 5 seconds..."
+  sleep 5
   puts "Checking status of request: #{id}"
   status = get_conversion_status(id)
   if status == 'Complete'
