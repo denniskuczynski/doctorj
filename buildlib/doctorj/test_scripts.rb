@@ -38,6 +38,9 @@ module Doctorj
         elsif status == 'InProcess'
           sleep 1
           next
+        else
+          puts "ERROR: Status of request #{id}: #{status}"
+          break
         end
       end
       file = client.get_conversion_file(id)

@@ -9,12 +9,10 @@ public class Application
 {
     public static void main(String[] args) throws Exception
     {
-        int numberOfThreads = Integer.parseInt(
-            System.getProperty("doctorj.numberOfThreads", "2"));
         DocumentConverter documentConverter = (DocumentConverter)Class.forName(
             System.getProperty("doctorj.converterClass", "doctorj.LibreOfficeDocumentConverter")).newInstance();
         documentConverter.initialize();
-        ConversionManager.INSTANCE.initialize(numberOfThreads, documentConverter);
+        ConversionManager.INSTANCE.initialize(documentConverter);
         
         ServletHolder sh = new ServletHolder(ServletContainer.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");

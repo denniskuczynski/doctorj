@@ -16,17 +16,15 @@ public enum ConversionManager {
 
     private static final String OUTPUT_DIRECTORY = "./data/output_docs";
 
-    private int conversionThreads = 1;
     private DocumentConverter documentConverter = null;
     private ConcurrentHashMap<String, String> requestStatusMap = null;
     private ExecutorService executor = null;
 
-    public void initialize(int threads, DocumentConverter documentConverter)
+    public void initialize(DocumentConverter documentConverter)
         throws Exception {
-        this.conversionThreads = threads;
         this.documentConverter = documentConverter;
         this.requestStatusMap = new ConcurrentHashMap<String, String>();
-        this.executor = Executors.newFixedThreadPool(this.conversionThreads);
+        this.executor = Executors.newSingleThreadExecutor();
     }
 
     public void shutdown()
