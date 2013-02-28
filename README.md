@@ -19,7 +19,7 @@ the basketball star.
   * http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 
-3. Ensure your JAVA_HOME environment variable is set
+3. Ensure your JAVA_HOME environment variable is set and ensure %JAVA_HOME%\bin is in the PATH environment variable.
 
 
 4. Ensure a 32bit JRuby is installed on the machine
