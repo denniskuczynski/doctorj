@@ -7,6 +7,8 @@ since I needed some software to batch convert Word Documents to PDFs that
 are renderable in the browser.  But it's an easy name to remember because of 
 the basketball star.
 
+![Screenshot](http://s12.postimage.org/c1j4fyshp/doctorj.png)
+
 ## Installation
 
 1. Download and install LibreOffice_4.0.0
@@ -23,12 +25,18 @@ http://jruby.org/
 5. Install the buildr gem for JRuby:
     jruby -S gem install buildr
 
-6. Clone this git repository
+6. If on Windows, ensure the Windows Error Reporting\DontShowUI registry setting is set to 1
+This will prevent LibreOffice crashes from hanging the doctorj process.
+http://social.technet.microsoft.com/Forums/en-US/winservergen/thread/8e7a7f48-a65e-4cd5-a55a-a62e4f7604cc/
 
-7. In the repository's root directory, execute: 
+7. If any firewall is running, ensure that TCP port 8080 is allowed for inbound connections.
+
+8. Clone this git repository
+
+9. In the repository's root directory, execute: 
     buildr run
 
-8. Use the REST API to submit files for conversion, check on conversion status, and retrieve files.
+10. Use the REST API to submit files for conversion, check on conversion status, and retrieve files.
 
 ## Testing
 
@@ -46,3 +54,7 @@ http://jruby.org/
 
 LibreOffice is released under the LGPL
 http://www.libreoffice.org/download/license/
+
+## Screenshot
+
+![Screenshot](http://s23.postimage.org/5naezxp8r/Screen_Shot_2013_02_28_at_2_13_43_PM.png)
