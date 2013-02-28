@@ -6,19 +6,22 @@ import java.io.File;
 /* Use the LibreOffice API to convert a document to PDF */
 public class LibreOfficeDocumentConverter implements DocumentConverter {
 
+    private static final int MAX_LOAD_ATTEMPTS = 3;
+
+    private com.sun.star.uno.XComponentContext xContext = null;
     private com.sun.star.frame.XComponentLoader xCompLoader = null;
 
     public void initialize()
         throws Exception {
-        com.sun.star.uno.XComponentContext xContext = 
-            com.sun.star.comp.helper.Bootstrap.bootstrap();
+        refreshDesktopInstance();
+    }
 
-        com.sun.star.lang.XMultiComponentFactory xMCF = 
-                xContext.getServiceManager();
-
+    public void refreshDesktopInstance() 
+        throws com.sun.star.comp.helper.BootstrapException, com.sun.star.uno.Exception {
+        this.xContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
+        com.sun.star.lang.XMultiComponentFactory xMCF = xContext.getServiceManager();
         Object oDesktop = xMCF.createInstanceWithContext(
-            "com.sun.star.frame.Desktop", xContext);
-
+            "com.sun.star.frame.Desktop", this.xContext);
         this.xCompLoader = (com.sun.star.frame.XComponentLoader)
             UnoRuntime.queryInterface(com.sun.star.frame.XComponentLoader.class,
                 oDesktop);
@@ -37,19 +40,34 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
         return "file:///" + file.getAbsolutePath().replace( '\\', '/' );
     }
 
-    // Return an object that will offer a simple way to store a document to a URL.    
-    private com.sun.star.frame.XStorable openDocument(String inputURL)
-        throws com.sun.star.io.IOException {
+    private Object getDocToStore(String inputURL) 
+        throws com.sun.star.comp.helper.BootstrapException, com.sun.star.uno.Exception {
         com.sun.star.beans.PropertyValue propertyValues[] =
             new com.sun.star.beans.PropertyValue[1];
         propertyValues[0] = new com.sun.star.beans.PropertyValue();
         propertyValues[0].Name = "Hidden";
         propertyValues[0].Value = new Boolean(true);
 
-        Object oDocToStore =
-            this.xCompLoader.loadComponentFromURL(
-                inputURL, "_blank", 0, propertyValues);
-        
+        int attempts = 0;
+        while (true) {
+            try {
+                return this.xCompLoader.loadComponentFromURL(
+                    inputURL, "_blank", 0, propertyValues);
+            } catch (com.sun.star.lang.DisposedException e) {
+                attempts = attempts + 1;
+                if (attempts < MAX_LOAD_ATTEMPTS) {
+                  refreshDesktopInstance();
+                } else {
+                  throw e;
+                }
+            }
+        }
+    }
+
+    // Return an object that will offer a simple way to store a document to a URL.    
+    private com.sun.star.frame.XStorable openDocument(String inputURL)
+        throws com.sun.star.comp.helper.BootstrapException, com.sun.star.uno.Exception {
+        Object oDocToStore = getDocToStore(inputURL);
         com.sun.star.frame.XStorable xStorable =
             (com.sun.star.frame.XStorable)UnoRuntime.queryInterface(
                 com.sun.star.frame.XStorable.class, oDocToStore );

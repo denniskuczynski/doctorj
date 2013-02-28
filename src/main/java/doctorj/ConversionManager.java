@@ -55,6 +55,11 @@ public enum ConversionManager {
                     ConversionManager.this.requestStatusMap.put(id, STATUS_ERROR);
                     e.printStackTrace();
                 }
+                try {
+                    file.delete();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         return id;
