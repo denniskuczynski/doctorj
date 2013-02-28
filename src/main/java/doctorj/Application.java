@@ -9,9 +9,10 @@ public class Application
 {
     public static void main(String[] args) throws Exception
     {
-        int numberOfThreads = 1;
-        //DocumentConverter documentConverter = new DummyDocumentConverter();
-        DocumentConverter documentConverter = new LibreOfficeDocumentConverter();
+        int numberOfThreads = Integer.parseInt(
+            System.getProperty("doctorj.numberOfThreads", "2"));
+        DocumentConverter documentConverter = (DocumentConverter)Class.forName(
+            System.getProperty("doctorj.converterClass", "doctorj.LibreOfficeDocumentConverter")).newInstance();
         documentConverter.initialize();
         ConversionManager.INSTANCE.initialize(numberOfThreads, documentConverter);
         
@@ -25,6 +26,22 @@ public class Application
  
         Server server = new Server(8080);
         server.setHandler(context);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                //Capture Control-C and exit gracefully
+                System.out.println("Shutting down Doctorj...");
+                try {
+                    ConversionManager.INSTANCE.shutdown();
+                    System.out.println("Shutdown doctorj.ConversionManager");
+                } catch(Exception e) {
+                    System.out.println("Unable to gracefully shutdown ConversionManager");
+                    e.printStackTrace();
+                }
+                System.out.println("Doctorj shutdown complete");
+            }
+        });
+
         server.start();
         server.join();
     }

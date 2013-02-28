@@ -15,7 +15,7 @@ public class DocumentConverterTest {
     @Test
     public void testDummyDocumentConversion() 
       throws Exception {
-        DocumentConverter converter = new DummyDocumentConverter();
+        DocumentConverter converter = new doctorj.DummyDocumentConverter();
         converter.initialize();
         converter.convertDocumentToPDF(new File("./data/example_docs/test1.odt"), new File("./data/output_docs/dummytest.pdf"));
     }
@@ -23,7 +23,7 @@ public class DocumentConverterTest {
     @Test
     public void testLibreOfficeDocumentConversion() 
       throws Exception {
-        DocumentConverter converter = new LibreOfficeDocumentConverter();
+        DocumentConverter converter = new doctorj.LibreOfficeDocumentConverter();
         converter.initialize();
         converter.convertDocumentToPDF(new File("./data/example_docs/test1.odt"), new File("./data/output_docs/libretest.pdf"));
     }

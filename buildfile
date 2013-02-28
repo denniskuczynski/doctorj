@@ -7,6 +7,8 @@ VERSION_NUMBER = "1.0.0"
 GROUP = "doctorj"
 COPYRIGHT = ""
 
+$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/buildlib')
+
 require 'rbconfig'
 target_os = RbConfig::CONFIG['target_os']
 
@@ -22,67 +24,17 @@ JETTY = ['org.mortbay.jetty:servlet-api:jar:3.0.20100224',
 JERSEY = ['asm:asm:jar:3.3.1',
           'com.sun.jersey:jersey-bundle:jar:1.17']
 
-def get_conversion_status(id)
-  uri = URI.parse("http://localhost:8080/convert/#{id}")
-  http = Net::HTTP.new(uri.host, uri.port)
-  request = Net::HTTP::Get.new(uri.request_uri)
-  response = http.request(request)
-  return response.body
+task :smoke_test do
+  require 'doctorj/test_scripts'
+
+  Doctorj::TestScripts.run_smoke_test
 end
 
-def add_conversion(file_path)
-  contents = open(file_path, "rb") {|io| io.read }
+task :load_test do
+  require 'doctorj/test_scripts'
 
-  uri = URI.parse("http://localhost:8080/convert")
-  http = Net::HTTP.new(uri.host, uri.port)
-  request = Net::HTTP::Post.new(uri.request_uri)
-  request["Content-Type"] = "application/octet-stream"
-  request.body = contents
-  response = http.request(request)
-  return response.body
-end
-
-def get_conversion_file(id)
-  uri = URI.parse("http://localhost:8080/convert/#{id}/file")
-  http = Net::HTTP.new(uri.host, uri.port)
-  request = Net::HTTP::Get.new(uri.request_uri)
-  response = http.request(request)
-  return response.body
-end
-
-def delete_conversion(id)
-  uri = URI.parse("http://localhost:8080/convert/#{id}")
-  http = Net::HTTP.new(uri.host, uri.port)
-  request = Net::HTTP::Delete.new(uri.request_uri)
-  response = http.request(request)
-  return response.body
-end
-
-task :test_client do
-  require "net/http"
-  require "uri"
-
-  file_path = './data/example_docs/test1.odt'
-  puts "Sending request to convert: #{file_path}"
-  id = add_conversion(file_path)
-  puts "Retrieved tracking id: #{id}"
-  puts "Waiting 5 seconds..."
-  sleep 5
-  puts "Checking status of request: #{id}"
-  status = get_conversion_status(id)
-  if status == 'Complete'
-    puts "Request: Complete, Retrieving file"
-    file = get_conversion_file(id)
-    if file
-      puts "Retrieved: #{file.size} bytes"
-      puts "Cleaning up request data"
-      status = delete_conversion(id)
-    else
-      puts "Unable to retrieve file"
-    end
-  else
-    puts "Request: #{status}"
-  end
+  document_count = 1000
+  Doctorj::TestScripts.run_load_test document_count
 end
 
 desc "The Doctorj project"
@@ -94,11 +46,11 @@ define "doctorj" do
   if target_os =~ /darwin/
     ure_path = '/Applications/LibreOffice.app/Contents/ure-link/share/java'
     uno_path = '/Applications/LibreOffice.app/Contents/MacOS'
-    java_args = ["-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
+    java_args = ["-Xms512m", "-Xmx512m", "-Ddoctorj.converterClass=doctorj.DummyDocumentConverter"]
   elsif target_os =~ /mswin32/
     ure_path = 'C:/Program Files (x86)/LibreOffice 4.0/URE/java'
     uno_path = 'C:/Program Files (x86)/LibreOffice 4.0/program'
-    java_args = ['-d32', "-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\""]
+    java_args = ['-d32', "-Xms512m", "-Xmx512m", "-Dcom.sun.star.lib.loader.unopath=\"#{uno_path}\"", "-Ddoctorj.converterClass=doctorj.LibreOfficeDocumentConverter"]
   end
 
   compile.with Dir["#{ure_path}/*.jar"]

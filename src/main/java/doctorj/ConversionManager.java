@@ -28,6 +28,11 @@ public enum ConversionManager {
         this.requestStatusMap = new ConcurrentHashMap<String, String>();
         this.executor = Executors.newFixedThreadPool(this.conversionThreads);
     }
+
+    public void shutdown()
+        throws Exception {
+        this.executor.shutdown();
+    }
     
     public String getConversionRequestStatus(String id) {
         String status = this.requestStatusMap.get(id);
