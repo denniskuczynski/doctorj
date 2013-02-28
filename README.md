@@ -7,7 +7,7 @@ since I needed some software to batch convert Word Documents to PDFs that
 are renderable in the browser.  But it's an easy name to remember because of 
 the basketball star.
 
-![Screenshot](http://s12.postimage.org/c1j4fyshp/doctorj.png)
+![Screenshot](http://s18.postimage.org/6ambx23hl/doctorj.png)
 
 ## Installation
 
@@ -74,4 +74,4 @@ http://www.libreoffice.org/download/license/
 
 ## Screenshot
 
-![Screenshot](http://s18.postimage.org/6ambx23hl/doctorj.png)
+![Screenshot](http://s23.postimage.org/5naezxp8r/Screen_Shot_2013_02_28_at_2_13_43_PM.png)
