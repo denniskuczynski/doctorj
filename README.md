@@ -12,35 +12,42 @@ the basketball star.
 ## Installation
 
 1. Download and install LibreOffice_4.0.0
-http://www.libreoffice.org/download/
+  * http://www.libreoffice.org/download/
 
 2. Ensure a 32bit JDK is installed on the machine
-http://www.oracle.com/technetwork/java/javase/downloads/index.html
+  * http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 3. Ensure your JAVA_HOME environment variable is set
 
 4. Ensure a 32bit JRuby is installed on the machine
-http://jruby.org/
+  * http://jruby.org/
 
 5. Install the buildr gem for JRuby:
-    jruby -S gem install buildr
+  * jruby -S gem install buildr
 
 6. If on Windows, ensure the Windows Error Reporting\DontShowUI registry setting is set to 1
-This will prevent LibreOffice crashes from hanging the doctorj process.
-http://social.technet.microsoft.com/Forums/en-US/winservergen/thread/8e7a7f48-a65e-4cd5-a55a-a62e4f7604cc/
+  * This will prevent LibreOffice crashes from hanging the doctorj process.
+  * http://social.technet.microsoft.com/Forums/en-US/winservergen/thread/8e7a7f48-a65e-4cd5-a55a-a62e4f7604cc/
 
 7. If any firewall is running, ensure that TCP port 8080 is allowed for inbound connections.
 
 8. Clone this git repository
 
 9. In the repository's root directory, execute: 
-    buildr run
+  * buildr run
 
 10. Use the REST API to submit files for conversion, check on conversion status, and retrieve files.
+
+## Usage
+
+You can see an example ruby client in the test script:  https://github.com/denniskuczynski/doctorj/tree/master/buildlib/doctorj
 
 ## Testing
 
 1. In the root directory, execute: buildr test
+2. There are also two Ruby test scripts
+  * buildr smoke_test
+  * buildr load_test
 
 ## Contributing
 
