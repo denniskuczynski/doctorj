@@ -74,4 +74,4 @@ http://www.libreoffice.org/download/license/
 
 ## Screenshot
 
-![Screenshot](http://s1.postimage.org/r2akmhu1b/doctorj.png)
+![Screenshot](http://s18.postimage.org/6ambx23hl/doctorj.png)
