@@ -2,6 +2,11 @@ package doctorj;
 
 import com.sun.star.uno.UnoRuntime;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 /* Use the LibreOffice API to convert a document to PDF */
 public class LibreOfficeDocumentConverter implements DocumentConverter {
@@ -10,9 +15,11 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
 
     private com.sun.star.uno.XComponentContext xContext = null;
     private com.sun.star.frame.XComponentLoader xCompLoader = null;
+    private Timer timer;
 
     public void initialize()
         throws Exception {
+        timer = Metrics.newTimer(LibreOfficeDocumentConverter.class, "convertDocumentToPDFs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         refreshDesktopInstance();
     }
 
@@ -29,11 +36,16 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
 
     public void convertDocumentToPDF(File document, File outputFile) 
         throws Exception {
-        String inputURL = getFileURL(document);
-        String outputURL = getFileURL(outputFile);
-        com.sun.star.frame.XStorable xStorable = openDocument(inputURL);
-        processDocument(xStorable, inputURL, outputURL);
-        closeDocument(xStorable);
+        final TimerContext context = timer.time();
+        try {
+            String inputURL = getFileURL(document);
+            String outputURL = getFileURL(outputFile);
+            com.sun.star.frame.XStorable xStorable = openDocument(inputURL);
+            processDocument(xStorable, inputURL, outputURL);
+            closeDocument(xStorable);
+        } finally {
+            context.stop();
+        }
     }
 
     private String getFileURL(File file) {

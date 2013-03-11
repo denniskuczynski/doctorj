@@ -21,6 +21,7 @@ public class DocumentConverterTest {
     }
 
     @Test
+    @Ignore
     public void testLibreOfficeDocumentConversion() 
       throws Exception {
         DocumentConverter converter = new doctorj.LibreOfficeDocumentConverter();

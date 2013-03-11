@@ -4,6 +4,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.yammer.metrics.reporting.AdminServlet;
+
  
 public class Application 
 {
@@ -20,6 +22,7 @@ public class Application
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
+        context.addServlet(new ServletHolder(new AdminServlet()), "/admin/*");
         context.addServlet(sh, "/*");
  
         Server server = new Server(8080);

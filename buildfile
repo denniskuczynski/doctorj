@@ -24,6 +24,17 @@ JETTY = ['org.mortbay.jetty:servlet-api:jar:3.0.20100224',
 JERSEY = ['asm:asm:jar:3.3.1',
           'com.sun.jersey:jersey-bundle:jar:1.17']
 
+METRICS = ['com.yammer.metrics:metrics-core:jar:2.2.0',
+           'com.yammer.metrics:metrics-servlet:jar:2.2.0']
+
+JACKSON = ['com.fasterxml.jackson.core:jackson-core:jar:2.1.4',
+           'com.fasterxml.jackson.core:jackson-databind:jar:2.1.4',
+           'com.fasterxml.jackson.core:jackson-annotations:jar:2.1.4']
+
+LOG4J = ['org.slf4j:slf4j-api:jar:1.7.2',
+         'org.slf4j:slf4j-log4j12:jar:1.7.2',
+         'log4j:log4j:jar:1.2.17']
+
 task :smoke_test do
   require 'doctorj/test_scripts'
 
@@ -58,12 +69,18 @@ define "doctorj" do
   compile.with JETTY
   compile.with JERSEY
   compile.with COMMONS_IO
+  compile.with JACKSON
+  compile.with LOG4J
+  compile.with METRICS
   
   test.compile.with Dir["#{ure_path}/*.jar"]
   test.compile.with "#{uno_path}/classes/unoil.jar"
   test.compile.with JETTY
   test.compile.with JERSEY
   test.compile.with COMMONS_IO
+  test.compile.with JACKSON
+  test.compile.with LOG4J
+  test.compile.with METRICS
     
   package(:jar)
   
