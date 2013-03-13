@@ -1,3 +1,10 @@
+     _            _             _ 
+  __| | ___   ___| |_ ___  _ __(_)
+ / _` |/ _ \ / __| __/ _ \| '__| |
+| (_| | (_) | (__| || (_) | |  | |
+ \__,_|\___/ \___|\__\___/|_| _/ |
+                             |__/ 
+
 # doctorj
 
 A simple server to connect to LibreOffice and convert documents to PDF format.
@@ -35,7 +42,7 @@ the basketball star.
   * http://social.technet.microsoft.com/Forums/en-US/winservergen/thread/8e7a7f48-a65e-4cd5-a55a-a62e4f7604cc/
 
 
-7. If any firewall is running, ensure that TCP port 8080 is allowed for inbound connections.
+7. If any firewall is running, ensure that TCP port 8080 is allowed for inbound connections. (And port 8081 for the admin interface)
 
 
 8. Clone this git repository
@@ -71,6 +78,8 @@ You can see an example ruby client in the test script:  https://github.com/denni
 
 LibreOffice is released under the LGPL
 http://www.libreoffice.org/download/license/
+
+doctorj uses the DropWizard framework (http://dropwizard.codahale.com/) which uses the Apache License
 
 ## Screenshot
 
