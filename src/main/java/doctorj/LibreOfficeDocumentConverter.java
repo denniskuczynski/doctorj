@@ -8,6 +8,9 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /* Use the LibreOffice API to convert a document to PDF */
 public class LibreOfficeDocumentConverter implements DocumentConverter {
 
@@ -15,12 +18,14 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
 
     private com.sun.star.uno.XComponentContext xContext = null;
     private com.sun.star.frame.XComponentLoader xCompLoader = null;
-    private Timer timer;
+    private Timer timer = null;
+    private Logger logger = null;
 
     public void initialize()
         throws Exception {
         timer = Metrics.newTimer(LibreOfficeDocumentConverter.class, "convertDocumentToPDFs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
         refreshDesktopInstance();
+        this.logger = LoggerFactory.getLogger("doctorj.LibreOfficeDocumentConverter");
     }
 
     public void refreshDesktopInstance() 
@@ -83,7 +88,7 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
         com.sun.star.frame.XStorable xStorable =
             (com.sun.star.frame.XStorable)UnoRuntime.queryInterface(
                 com.sun.star.frame.XStorable.class, oDocToStore );
-        System.out.println("Opened document: "+inputURL);
+        logger.debug("Opened document: "+inputURL);
         return xStorable;
     }
 
@@ -100,7 +105,7 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
 
         // Storing and converting the document
         xStorable.storeToURL(outputURL, propertyValues);
-        System.out.println("Wrote file to: "+outputURL);
+        logger.debug("Wrote file to: "+outputURL);
     }
 
     // Closing the converted document. Use XCloseable.clsoe if the
@@ -119,6 +124,6 @@ public class LibreOfficeDocumentConverter implements DocumentConverter {
 
             xComp.dispose();
         }
-        System.out.println("Closed document");
+        logger.debug("Closed document");
     }
 }

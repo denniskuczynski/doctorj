@@ -22,27 +22,12 @@ public class DoctorjService extends Service<DoctorjConfiguration> {
                 System.getProperty("doctorj.converterClass", "doctorj.LibreOfficeDocumentConverter")).newInstance();
             documentConverter.initialize();
             ConversionManager.INSTANCE.initialize(documentConverter);
+            environment.manage(ConversionManager.INSTANCE);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
-
         environment.addResource(new doctorj.resources.ConversionRequestResource());
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                //Capture Control-C and exit gracefully
-                System.out.println("Shutting down Doctorj...");
-                try {
-                    ConversionManager.INSTANCE.shutdown();
-                    System.out.println("Shutdown doctorj.ConversionManager");
-                } catch(Exception e) {
-                    System.out.println("Unable to gracefully shutdown ConversionManager");
-                    e.printStackTrace();
-                }
-                System.out.println("Doctorj shutdown complete");
-            }
-        });
     }
 
 }

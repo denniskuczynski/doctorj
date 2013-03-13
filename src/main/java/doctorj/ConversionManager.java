@@ -4,9 +4,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import com.yammer.dropwizard.lifecycle.Managed;
+
 import java.io.File;
 
-public enum ConversionManager {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public enum ConversionManager implements Managed {
     INSTANCE;
 
     private static final String STATUS_NOT_FOUND  = "NotFound";
@@ -19,17 +24,30 @@ public enum ConversionManager {
     private DocumentConverter documentConverter = null;
     private ConcurrentHashMap<String, String> requestStatusMap = null;
     private ExecutorService executor = null;
+    private Logger logger = null;
 
     public void initialize(DocumentConverter documentConverter)
         throws Exception {
         this.documentConverter = documentConverter;
         this.requestStatusMap = new ConcurrentHashMap<String, String>();
         this.executor = Executors.newSingleThreadExecutor();
+        this.logger = LoggerFactory.getLogger("doctorj.ConversionManager");
     }
 
     public void shutdown()
         throws Exception {
+        this.logger.info("Shutting down doctorj.ConversionManager");
         this.executor.shutdown();
+    }
+
+    @Override
+    public void start() throws Exception {
+        //nothing to start
+    }
+
+    @Override
+    public void stop() throws Exception {
+        shutdown();
     }
     
     public String getConversionRequestStatus(String id) {
@@ -47,7 +65,7 @@ public enum ConversionManager {
         this.executor.submit(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Converting to PDF: "+file.getAbsolutePath());
+                logger.debug("Converting to PDF: "+file.getAbsolutePath());
                 try {
                     ConversionManager.this.documentConverter.convertDocumentToPDF(file, getOutputFile(id));
                     ConversionManager.this.requestStatusMap.put(id, STATUS_COMPLETE);
@@ -74,7 +92,7 @@ public enum ConversionManager {
         try {
             if (file.exists()) { file.delete(); }
         } catch(Exception e) {
-            System.out.println("Error deleting file: "+file.getAbsolutePath());
+            this.logger.error("Error deleting file: "+file.getAbsolutePath(), e);
         }
         String status = this.requestStatusMap.remove(id);
         if (status == null) {
