@@ -16,7 +16,7 @@ public class DummyDocumentConverter implements DocumentConverter {
 
     public void initialize() 
         throws Exception {
-        timer = Metrics.newTimer(LibreOfficeDocumentConverter.class, "convertDocumentToPDFs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        timer = Metrics.newTimer(DummyDocumentConverter.class, "convertDocumentToPDFs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
     }
 
     public void convertDocumentToPDF(File document, File outputFile) 
@@ -26,7 +26,7 @@ public class DummyDocumentConverter implements DocumentConverter {
             if (!outputFile.exists()) { outputFile.createNewFile(); }        
             try (FileOutputStream fos = new FileOutputStream(outputFile, false);
                 ByteArrayInputStream dummyStream = new ByteArrayInputStream("DUMMY".getBytes())) {
-                org.apache.commons.io.IOUtils.copy(dummyStream, fos); 
+                com.google.common.io.ByteStreams.copy(dummyStream, fos); 
             }
         } finally {
             context.stop();

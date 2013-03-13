@@ -34,7 +34,7 @@ public class ConversionRequestResource {
         throws IOException {
         File temp = File.createTempFile("tempfile", ".tmp");
         try (FileOutputStream fos = new FileOutputStream(temp)) {
-          org.apache.commons.io.IOUtils.copy(httpRequest.getInputStream(), fos); 
+          com.google.common.io.ByteStreams.copy(httpRequest.getInputStream(), fos); 
         }
         return doctorj.ConversionManager.INSTANCE.addConversionRequest(temp);
     }
